@@ -6,16 +6,16 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 library(googlesheets4)
-library(moderndive)
+library(infer)
 library(tidyverse)
 ```
 
 ```{r}
 sheets_deauth()
 x<- read_sheet("1cgP-e6THVfiW5TJ95QhX3jkNxKvc8Sicp9k_BkSRd2I")
-x%>% mutate(prop_red = red/(white+red))%>%drop_na()
+x<-x%>% mutate(prop_red = (red/(white+red)))%>%drop_na()
 ```
 
 ```{r}
@@ -25,5 +25,11 @@ x%>%ggplot(aes(prop_red))+geom_bar()
 
 ```{r}
 urn <- tibble(bead = c(rep("Red", 2000), rep("White", 8000)))
+
+expData<-urn %>%
+  rep_sample_n(size = 25, replace = TRUE, reps = 1000)%>%group_by(replicate)%>%
+  mutate(prop_red = sum(bead == "Red")/25)
+
+expData%>%ggplot(aes(prop_red))+geom_bar()
 ```
 
